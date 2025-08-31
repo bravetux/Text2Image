@@ -9,8 +9,7 @@ interface GeneratedImageProps {
   userName: string;
   email: string;
   phone: string;
-  wish?: string;
-  customWish?: string;
+  wishText?: string;
   userPhotoUrl?: string;
   fontSize: number;
   textAlign: "left" | "center" | "right";
@@ -22,7 +21,7 @@ interface GeneratedImageProps {
   backgroundColor: string;
 }
 
-export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImageProps>(({ imageUrl, userName, email, phone, wish, customWish, userPhotoUrl, fontSize, textAlign, fontColor, fontFamily, userPhotoAlignment, userPhotoSize, swapImageAndText, backgroundColor }, ref) => {
+export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImageProps>(({ imageUrl, userName, email, phone, wishText, userPhotoUrl, fontSize, textAlign, fontColor, fontFamily, userPhotoAlignment, userPhotoSize, swapImageAndText, backgroundColor }, ref) => {
   const imageRef = useRef<HTMLImageElement>(null);
   const [renderedImageWidth, setRenderedImageWidth] = useState<number | undefined>(undefined);
 
@@ -85,8 +84,6 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
 
   const currentAvatarSize = (userPhotoSize / 100) * baseAvatarSize;
   const currentIconSize = (userPhotoSize / 100) * baseIconSize;
-
-  const wishText = wish === "Custom" ? customWish : wish;
 
   return (
     <Card className="w-full max-w-lg overflow-hidden" ref={ref}>

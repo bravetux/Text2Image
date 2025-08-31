@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-
+import { Textarea } from "@/components/ui/textarea";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Slider } from "./ui/slider";
@@ -54,12 +54,23 @@ interface ImageGeneratorFormProps {
 
 const LOCAL_STORAGE_KEY = "imageGeneratorFormData";
 
+const wishMap: { [key: string]: string } = {
+  "Birthday": "Wishing you a very Happy Birthday!",
+  "Wedding": "Congratulations on your wedding!",
+  "Diwali": "Happy Diwali! May the festival of lights bring joy and prosperity.",
+  "Pongal": "Happy Pongal! Wishing you a bountiful harvest and happiness.",
+  "Christmas": "Merry Christmas and a Happy New Year!",
+  "New Year": "Happy New Year! Wishing you all the best for the year ahead.",
+  "Navarathri Pooja": "Happy Navarathri! May the divine blessings be with you.",
+  "Custom": ""
+};
+
 const defaultValues = {
   userName: "",
   email: "",
   phone: "",
   wish: "Birthday",
-  customWish: "",
+  customWish: wishMap["Birthday"],
   fontSize: 18,
   textAlign: "left",
   fontFamily: "Roboto",
@@ -93,7 +104,6 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }
   });
 
   const watchedValues = form.watch();
-  const watchedWish = form.watch("wish");
 
   useEffect(() => {
     try {
@@ -175,12 +185,18 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }
               name="wish"
               render={({ field }) => (
                 <FormItem className="grid grid-cols-3 items-center gap-x-1">
-                  <FormLabel className="text-right pr-2">Wish</FormLabel>
+                  <FormLabel className="text-right pr-2">Occasion</FormLabel>
                   <div className="col-span-2">
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        form.setValue("customWish", wishMap[value] || "");
+                      }}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a wish" />
+                          <SelectValue placeholder="Select an occasion" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -199,23 +215,21 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }
                 </FormItem>
               )}
             />
-            {watchedWish === "Custom" && (
-              <FormField
-                control={form.control}
-                name="customWish"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-3 items-center gap-x-1">
-                    <FormLabel className="text-right pr-2">Custom Wish</FormLabel>
-                    <div className="col-span-2">
-                      <FormControl>
-                        <Input placeholder="Enter your custom wish" {...field} />
-                      </FormControl>
-                      <FormMessage className="mt-1" />
-                    </div>
-                  </FormItem>
-                )}
-              />
-            )}
+            <FormField
+              control={form.control}
+              name="customWish"
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-3 items-center gap-x-1">
+                  <FormLabel className="text-right pr-2">Wish Message</FormLabel>
+                  <div className="col-span-2">
+                    <FormControl>
+                      <Textarea placeholder="Enter your wish message" {...field} />
+                    </FormControl>
+                    <FormMessage className="mt-1" />
+                  </div>
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="backgroundImage"

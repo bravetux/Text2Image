@@ -67,8 +67,7 @@ const Index = () => {
                 userName={imageData.userName}
                 email={imageData.email}
                 phone={imageData.phone}
-                wish={imageData.wish}
-                customWish={imageData.customWish}
+                wishText={imageData.customWish}
                 userPhotoUrl={userPhotoUrl}
                 fontSize={imageData.fontSize}
                 textAlign={imageData.textAlign}

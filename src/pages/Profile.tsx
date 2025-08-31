@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { showLoading, showSuccess, showError, dismissToast } from '@/utils/toast';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
+import SubscriptionPlans from '@/components/SubscriptionPlans';
 
 const profileSchema = z.object({
   first_name: z.string().min(1, 'First name is required'),
@@ -142,7 +143,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Your Profile</CardTitle>
@@ -206,6 +207,7 @@ const Profile = () => {
           </Form>
         </CardContent>
       </Card>
+      <SubscriptionPlans />
     </div>
   );
 };

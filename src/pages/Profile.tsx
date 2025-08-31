@@ -82,15 +82,8 @@ const Profile = () => {
 
     const toastId = showLoading('Updating profile...');
     try {
-      // Update auth user first
-      const { error: authError } = await supabase.auth.updateUser({
-        phone: values.phone,
-      });
-
-      if (authError) throw authError;
-
-      // Then upsert the public profiles table
-      const { error } = await supabase
+      // First, upsert the public profiles table, which is the primary data source for the app
+      const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
           id: session.user.id,
@@ -102,7 +95,18 @@ const Profile = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // If profile update is successful, then try to update the auth user.
+      // This is secondary and might fail due to security policies (e.g., requiring re-authentication).
+      // We'll log the error but won't block the user from seeing a success message for the main profile update.
+      const { error: authError } = await supabase.auth.updateUser({
+        phone: values.phone,
+      });
+
+      if (authError) {
+        console.warn('Could not update auth user phone:', authError.message);
+      }
 
       dismissToast(toastId);
       showSuccess('Profile updated successfully!');

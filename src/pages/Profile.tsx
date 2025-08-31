@@ -89,16 +89,18 @@ const Profile = () => {
 
       if (authError) throw authError;
 
-      // Then update the public profiles table
+      // Then upsert the public profiles table
       const { error } = await supabase
         .from('profiles')
-        .update({
+        .upsert({
+          id: session.user.id,
           first_name: values.first_name,
           last_name: values.last_name,
           phone: values.phone,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', session.user.id);
+        .select()
+        .single();
 
       if (error) throw error;
 

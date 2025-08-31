@@ -3,8 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useRef, useState, useEffect } from "react";
-import { toast } from "sonner";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription, // Imported FormDescription
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -24,13 +23,15 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collap
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Slider } from "./ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
-import { Switch } from "./ui/switch"; // Import Switch component
+import { Switch } from "./ui/switch";
 import html2canvas from "html2canvas";
 
 const formSchema = z.object({
   userName: z.string().min(2, "Your name must be at least 2 characters."),
   email: z.string().email("Please enter a valid email address."),
   phone: z.string().min(10, "Please enter a valid phone number."),
+  wish: z.string().optional(),
+  customWish: z.string().optional(),
   backgroundImage: z.custom<FileList>().optional(),
   userPhoto: z.custom<FileList>().optional(),
   fontSize: z.number().min(8).max(72).default(18),
@@ -40,7 +41,7 @@ const formSchema = z.object({
   fontColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Please enter a valid hex color.").default("#333333"),
   userPhotoAlignment: z.enum(["left", "center", "right"]).default("left"),
   userPhotoSize: z.number().min(10).max(300).default(100),
-  swapImageAndText: z.boolean().default(false), // New field for swapping
+  swapImageAndText: z.boolean().default(false),
 });
 
 export type ImageGeneratorFormValues = z.infer<typeof formSchema>;
@@ -57,6 +58,8 @@ const defaultValues = {
   userName: "",
   email: "",
   phone: "",
+  wish: "Birthday",
+  customWish: "",
   fontSize: 18,
   textAlign: "left",
   fontFamily: "Roboto",
@@ -64,13 +67,13 @@ const defaultValues = {
   fontColor: "#333333",
   userPhotoAlignment: "left",
   userPhotoSize: 100,
-  swapImageAndText: false, // Default value for the new field
+  swapImageAndText: false,
 };
 
 export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }: ImageGeneratorFormProps) {
   const [isTextOptionsOpen, setIsTextOptionsOpen] = useState(false);
   const [isImageOptionsOpen, setIsImageOptionsOpen] = useState(false);
-  const [isLayoutOptionsOpen, setIsLayoutOptionsOpen] = useState(false); // State for new collapsible
+  const [isLayoutOptionsOpen, setIsLayoutOptionsOpen] = useState(false);
   const [isColorOptionsOpen, setIsColorOptionsOpen] = useState(false);
 
   const getInitialValues = () => {
@@ -90,6 +93,7 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }
   });
 
   const watchedValues = form.watch();
+  const watchedWish = form.watch("wish");
 
   useEffect(() => {
     try {
@@ -110,8 +114,6 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }
       });
     }
   };
-
-  
 
   return (
     <Card className="w-full max-w-lg">
@@ -168,6 +170,52 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="wish"
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-3 items-center gap-x-1">
+                  <FormLabel className="text-right pr-2">Wish</FormLabel>
+                  <div className="col-span-2">
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a wish" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Birthday">Birthday</SelectItem>
+                        <SelectItem value="Wedding">Wedding</SelectItem>
+                        <SelectItem value="Diwali">Diwali</SelectItem>
+                        <SelectItem value="Pongal">Pongal</SelectItem>
+                        <SelectItem value="Christmas">Christmas</SelectItem>
+                        <SelectItem value="New Year">New Year</SelectItem>
+                        <SelectItem value="Navarathri Pooja">Navarathri Pooja</SelectItem>
+                        <SelectItem value="Custom">Custom</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+            {watchedWish === "Custom" && (
+              <FormField
+                control={form.control}
+                name="customWish"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-3 items-center gap-x-1">
+                    <FormLabel className="text-right pr-2">Custom Wish</FormLabel>
+                    <div className="col-span-2">
+                      <FormControl>
+                        <Input placeholder="Enter your custom wish" {...field} />
+                      </FormControl>
+                      <FormMessage className="mt-1" />
+                    </div>
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="backgroundImage"
@@ -408,7 +456,6 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }
               </CollapsibleContent>
             </Collapsible>
 
-            {/* New Collapsible for Layout Options */}
             <Collapsible open={isLayoutOptionsOpen} onOpenChange={setIsLayoutOptionsOpen}>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" className="w-full flex justify-between items-center px-2">

@@ -9,6 +9,8 @@ interface GeneratedImageProps {
   userName: string;
   email: string;
   phone: string;
+  wish?: string;
+  customWish?: string;
   userPhotoUrl?: string;
   fontSize: number;
   textAlign: "left" | "center" | "right";
@@ -16,11 +18,11 @@ interface GeneratedImageProps {
   fontFamily: string;
   userPhotoAlignment: "left" | "center" | "right";
   userPhotoSize: number;
-  swapImageAndText: boolean; // New prop
+  swapImageAndText: boolean;
   backgroundColor: string;
 }
 
-export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImageProps>(({ imageUrl, userName, email, phone, userPhotoUrl, fontSize, textAlign, fontColor, fontFamily, userPhotoAlignment, userPhotoSize, swapImageAndText, backgroundColor }, ref) => {
+export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImageProps>(({ imageUrl, userName, email, phone, wish, customWish, userPhotoUrl, fontSize, textAlign, fontColor, fontFamily, userPhotoAlignment, userPhotoSize, swapImageAndText, backgroundColor }, ref) => {
   const imageRef = useRef<HTMLImageElement>(null);
   const [renderedImageWidth, setRenderedImageWidth] = useState<number | undefined>(undefined);
 
@@ -78,12 +80,13 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
     backgroundColor: backgroundColor,
   };
 
-  // Calculate avatar and icon size based on percentage
-  const baseAvatarSize = 40; // Corresponds to h-10 w-10
-  const baseIconSize = 20; // Corresponds to h-5 w-5
+  const baseAvatarSize = 40;
+  const baseIconSize = 20;
 
   const currentAvatarSize = (userPhotoSize / 100) * baseAvatarSize;
   const currentIconSize = (userPhotoSize / 100) * baseIconSize;
+
+  const wishText = wish === "Custom" ? customWish : wish;
 
   return (
     <Card className="w-full max-w-lg overflow-hidden" ref={ref}>
@@ -96,7 +99,6 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
               alt="Generated background"
               className="w-full h-auto"
             />
-            {/* Watermark */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <span className="text-5xl font-extrabold text-gray-300 dark:text-gray-700 opacity-30 transform -rotate-45 select-none">
                 BRAVETUX
@@ -106,7 +108,7 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
           <div
             className={cn(
               "p-4 flex flex-col sm:flex-row sm:items-center sm:space-x-4 border-t w-full",
-              { "sm:flex-row-reverse sm:space-x-reverse": swapImageAndText } // Apply reverse order
+              { "sm:flex-row-reverse sm:space-x-reverse": swapImageAndText }
             )}
             style={detailsContainerStyle}
           >
@@ -128,6 +130,7 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
               <h3 className="font-bold" style={nameStyle}>{userName}</h3>
               <p style={detailsStyle}>{email}</p>
               <p style={detailsStyle}>{phone}</p>
+              {wishText && <p style={detailsStyle}>{wishText}</p>}
             </div>
           </div>
         </div>

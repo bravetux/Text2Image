@@ -93,7 +93,7 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }
     try {
       const item = window.localStorage.getItem(LOCAL_STORAGE_KEY);
       const parsedItem = item ? JSON.parse(item) : {};
-      return { ...defaultValues, ...parsedItem };
+      return { ...defaultValues, ...parsedItem, date: new Date().toLocaleDateString() };
     } catch (error) {
       console.warn("Error reading localStorage:", error);
       return defaultValues;

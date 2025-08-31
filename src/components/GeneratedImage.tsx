@@ -21,7 +21,6 @@ interface GeneratedImageProps {
 }
 
 export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImageProps>(({ imageUrl, userName, email, phone, userPhotoUrl, fontSize, textAlign, fontColor, fontFamily, userPhotoAlignment, userPhotoSize, swapImageAndText, backgroundColor }, ref) => {
-  console.log("fontFamily prop:", fontFamily);
   const imageRef = useRef<HTMLImageElement>(null);
   const [renderedImageWidth, setRenderedImageWidth] = useState<number | undefined>(undefined);
 
@@ -87,7 +86,7 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
   const currentIconSize = (userPhotoSize / 100) * baseIconSize;
 
   return (
-    <Card className="w-full max-w-lg overflow-hidden">
+    <Card className="w-full max-w-lg overflow-hidden" ref={ref}>
       <CardContent className="p-0">
         <div className="flex flex-col items-center">
           <div className="bg-gray-200 dark:bg-gray-800 w-full relative">
@@ -135,4 +134,6 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
       </CardContent>
     </Card>
   );
-}
+});
+
+GeneratedImage.displayName = "GeneratedImage";

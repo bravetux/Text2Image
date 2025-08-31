@@ -15,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const profileSchema = z.object({
   first_name: z.string().min(1, 'First name is required'),
   last_name: z.string().min(1, 'Last name is required'),
+  phone: z.string().min(10, 'A valid phone number is required'),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -28,6 +29,7 @@ const Profile = () => {
     defaultValues: {
       first_name: '',
       last_name: '',
+      phone: '',
     },
   });
 
@@ -43,7 +45,7 @@ const Profile = () => {
         try {
           const { data, error } = await supabase
             .from('profiles')
-            .select('first_name, last_name')
+            .select('first_name, last_name, phone')
             .eq('id', session.user.id)
             .single();
 
@@ -52,7 +54,16 @@ const Profile = () => {
           }
 
           if (data) {
-            form.reset(data);
+            form.reset({
+              ...data,
+              phone: data.phone || session.user.phone || '',
+            });
+          } else {
+            form.reset({
+              first_name: '',
+              last_name: '',
+              phone: session.user.phone || '',
+            });
           }
           dismissToast(toastId);
         } catch (error) {
@@ -71,11 +82,20 @@ const Profile = () => {
 
     const toastId = showLoading('Updating profile...');
     try {
+      // Update auth user first
+      const { error: authError } = await supabase.auth.updateUser({
+        phone: values.phone,
+      });
+
+      if (authError) throw authError;
+
+      // Then update the public profiles table
       const { error } = await supabase
         .from('profiles')
         .update({
           first_name: values.first_name,
           last_name: values.last_name,
+          phone: values.phone,
           updated_at: new Date().toISOString(),
         })
         .eq('id', session.user.id);
@@ -129,10 +149,19 @@ const Profile = () => {
                 <Label>Email</Label>
                 <Input value={session.user.email || 'Not provided'} disabled />
               </div>
-              <div className="space-y-2">
-                <Label>Phone</Label>
-                <Input value={session.user.phone || 'Not provided'} disabled />
-              </div>
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+1234567890" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="first_name"

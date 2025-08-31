@@ -54,6 +54,7 @@ interface ImageGeneratorFormProps {
 const LOCAL_STORAGE_KEY = "imageGeneratorFormData";
 
 const wishMap: { [key: string]: string } = {
+  "None": "",
   "Birthday": "Wishing you a very Happy Birthday!",
   "Wedding": "Congratulations on your wedding!",
   "Diwali": "Happy Diwali! May the festival of lights bring joy and prosperity.",
@@ -104,6 +105,7 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
   });
 
   const watchedValues = form.watch();
+  const watchedWish = form.watch("wish");
 
   useEffect(() => {
     try {
@@ -189,6 +191,7 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        <SelectItem value="None">None</SelectItem>
                         <SelectItem value="Birthday">Birthday</SelectItem>
                         <SelectItem value="Wedding">Wedding</SelectItem>
                         <SelectItem value="Diwali">Diwali</SelectItem>
@@ -212,7 +215,11 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
                   <FormLabel className="text-right pr-2">Wish Message</FormLabel>
                   <div className="col-span-2">
                     <FormControl>
-                      <Textarea placeholder="Enter your wish message" {...field} />
+                      <Textarea
+                        placeholder="Enter your wish message"
+                        {...field}
+                        disabled={watchedWish === "None"}
+                      />
                     </FormControl>
                     <FormMessage className="mt-1" />
                   </div>

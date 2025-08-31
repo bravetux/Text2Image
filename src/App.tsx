@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 import { SessionProvider, useSession } from "./context/SessionContext";
 import { Skeleton } from "./components/ui/skeleton";
 
@@ -28,6 +29,10 @@ const AppRoutes = () => {
       <Route 
         path="/" 
         element={session ? <Index /> : <Navigate to="/login" replace />} 
+      />
+      <Route 
+        path="/profile" 
+        element={session ? <Profile /> : <Navigate to="/login" replace />} 
       />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />

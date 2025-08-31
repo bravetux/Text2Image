@@ -19,9 +19,10 @@ interface GeneratedImageProps {
   userPhotoSize: number;
   swapImageAndText: boolean;
   backgroundColor: string;
+  date?: string;
 }
 
-export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImageProps>(({ imageUrl, userName, email, phone, wishText, userPhotoUrl, fontSize, textAlign, fontColor, fontFamily, userPhotoAlignment, userPhotoSize, swapImageAndText, backgroundColor }, ref) => {
+export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImageProps>(({ imageUrl, userName, email, phone, wishText, userPhotoUrl, fontSize, textAlign, fontColor, fontFamily, userPhotoAlignment, userPhotoSize, swapImageAndText, backgroundColor, date }, ref) => {
   const imageRef = useRef<HTMLImageElement>(null);
   const [renderedImageWidth, setRenderedImageWidth] = useState<number | undefined>(undefined);
 
@@ -128,6 +129,7 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
               <h3 className="font-bold" style={nameStyle}>{userName}</h3>
               <p style={detailsStyle}>{email}</p>
               <p style={detailsStyle}>{phone}</p>
+              {date && <p style={detailsStyle}>{date}</p>}
             </div>
           </div>
         </div>

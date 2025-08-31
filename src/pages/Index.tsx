@@ -77,6 +77,7 @@ const Index = () => {
                 swapImageAndText={imageData.swapImageAndText}
                 fontFamily={imageData.fontFamily}
                 backgroundColor={imageData.backgroundColor}
+                date={imageData.date}
               />
             </div>
           )}

@@ -49,7 +49,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4 md:p-8">
       <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         <div className="w-full">
-          <ImageGeneratorForm onSubmit={handleFormSubmit} isGenerating={isGenerating} generatedImageRef={generatedImageRef} />
+          <ImageGeneratorForm onSubmit={handleFormSubmit} isGenerating={isGenerating} />
         </div>
         
         <div className="w-full flex items-center justify-center md:sticky md:top-8">

@@ -24,7 +24,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Slider } from "./ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { Switch } from "./ui/switch";
-import html2canvas from "html2canvas";
 
 const formSchema = z.object({
   userName: z.string().min(2, "Your name must be at least 2 characters."),
@@ -50,7 +49,6 @@ export type ImageGeneratorFormValues = z.infer<typeof formSchema>;
 interface ImageGeneratorFormProps {
   onSubmit: (values: ImageGeneratorFormValues) => void;
   isGenerating: boolean;
-  generatedImageRef: React.RefObject<HTMLDivElement>;
 }
 
 const LOCAL_STORAGE_KEY = "imageGeneratorFormData";
@@ -83,7 +81,7 @@ const defaultValues = {
   swapImageAndText: false,
 };
 
-export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }: ImageGeneratorFormProps) {
+export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFormProps) {
   const [isTextOptionsOpen, setIsTextOptionsOpen] = useState(false);
   const [isImageOptionsOpen, setIsImageOptionsOpen] = useState(false);
   const [isLayoutOptionsOpen, setIsLayoutOptionsOpen] = useState(false);
@@ -115,17 +113,6 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }
       console.warn("Error writing to localStorage:", error);
     }
   }, [JSON.stringify(watchedValues)]);
-
-  const handleSaveImage = () => {
-    if (generatedImageRef.current) {
-      html2canvas(generatedImageRef.current).then((canvas) => {
-        const link = document.createElement("a");
-        link.download = "generated-image.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      });
-    }
-  };
 
   return (
     <Card className="w-full max-w-lg">
@@ -292,12 +279,9 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, generatedImageRef }
               )}
             />
 
-            <div className="grid grid-cols-2 gap-2 pt-2">
+            <div className="pt-2">
               <Button type="submit" disabled={isGenerating} className="w-full">
                 {isGenerating ? "Generating..." : "Generate Image"}
-              </Button>
-              <Button type="button" onClick={handleSaveImage} className="w-full">
-                Save Image
               </Button>
             </div>
 

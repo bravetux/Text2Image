@@ -1,8 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from "lucide-react";
+import { User, Download, Share2 } from "lucide-react";
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import html2canvas from "html2canvas";
+import { showError, showSuccess } from "@/utils/toast";
 
 interface GeneratedImageProps {
   imageUrl: string;
@@ -24,6 +27,7 @@ interface GeneratedImageProps {
 
 export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImageProps>(({ imageUrl, userName, email, phone, wishText, userPhotoUrl, fontSize, textAlign, fontColor, fontFamily, userPhotoAlignment, userPhotoSize, swapImageAndText, backgroundColor, date }, ref) => {
   const imageRef = useRef<HTMLImageElement>(null);
+  const imageContentRef = useRef<HTMLDivElement>(null);
   const [renderedImageWidth, setRenderedImageWidth] = useState<number | undefined>(undefined);
 
   const calculateImageSize = useCallback(() => {
@@ -55,6 +59,45 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
       window.removeEventListener("resize", calculateImageSize);
     };
   }, [imageUrl, calculateImageSize]);
+
+  const handleSaveImage = () => {
+    if (imageContentRef.current) {
+      html2canvas(imageContentRef.current).then((canvas) => {
+        const link = document.createElement("a");
+        link.download = "generated-image.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+  };
+
+  const handleShareImage = async () => {
+    if (!imageContentRef.current) return;
+
+    try {
+      const canvas = await html2canvas(imageContentRef.current);
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          showError("Could not create image blob.");
+          return;
+        }
+        const file = new File([blob], "generated-image.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'My Generated Image',
+            text: 'Check out this image I created!',
+          });
+          showSuccess("Image shared successfully!");
+        } else {
+          showError("Web Share API is not supported on your browser for sharing files.");
+        }
+      }, 'image/png');
+    } catch (error) {
+      console.error("Sharing failed:", error);
+      showError("Failed to share image.");
+    }
+  };
 
   const containerStyle: React.CSSProperties = {
     textAlign,
@@ -89,49 +132,61 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
   return (
     <Card className="w-full max-w-lg overflow-hidden" ref={ref}>
       <CardContent className="p-0">
-        <div className="flex flex-col items-center">
-          <div className="bg-gray-200 dark:bg-gray-800 w-full relative">
-            <img
-              ref={imageRef}
-              src={imageUrl}
-              alt="Generated background"
-              className="w-full h-auto"
-            />
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <span className="text-5xl font-extrabold text-gray-300 dark:text-gray-700 opacity-30 transform -rotate-45 select-none">
-                BRAVETUX
-              </span>
-            </div>
-          </div>
-          <div
-            className={cn(
-              "p-4 flex flex-col sm:flex-row sm:items-center sm:space-x-4 border-t w-full",
-              { "sm:flex-row-reverse sm:space-x-reverse": swapImageAndText }
-            )}
-            style={detailsContainerStyle}
-          >
-            {userPhotoUrl && (
-              <div className={cn("flex w-full sm:flex-1", {
-                "justify-start": userPhotoAlignment === "left",
-                "justify-center": userPhotoAlignment === "center",
-                "justify-end": userPhotoAlignment === "right",
-              })}>
-                <Avatar style={{ width: currentAvatarSize, height: currentAvatarSize }}>
-                  <AvatarImage src={userPhotoUrl} alt={userName} />
-                  <AvatarFallback style={{ width: currentIconSize, height: currentIconSize }}>
-                    <User style={{ width: currentIconSize, height: currentIconSize }} />
-                  </AvatarFallback>
-                </Avatar>
+        <div ref={imageContentRef}>
+          <div className="flex flex-col items-center">
+            <div className="bg-gray-200 dark:bg-gray-800 w-full relative">
+              <img
+                ref={imageRef}
+                src={imageUrl}
+                alt="Generated background"
+                className="w-full h-auto"
+              />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <span className="text-5xl font-extrabold text-gray-300 dark:text-gray-700 opacity-30 transform -rotate-45 select-none">
+                  BRAVETUX
+                </span>
               </div>
-            )}
-            <div className="w-full sm:flex-1" style={containerStyle}>
-              {wishText && <p style={nameStyle}>{wishText}</p>}
-              <h3 className="font-bold" style={nameStyle}>{userName}</h3>
-              <p style={detailsStyle}>{email}</p>
-              <p style={detailsStyle}>{phone}</p>
-              {date && <p style={detailsStyle}>{date}</p>}
+            </div>
+            <div
+              className={cn(
+                "p-4 flex flex-col sm:flex-row sm:items-center sm:space-x-4 border-t w-full",
+                { "sm:flex-row-reverse sm:space-x-reverse": swapImageAndText }
+              )}
+              style={detailsContainerStyle}
+            >
+              {userPhotoUrl && (
+                <div className={cn("flex w-full sm:flex-1", {
+                  "justify-start": userPhotoAlignment === "left",
+                  "justify-center": userPhotoAlignment === "center",
+                  "justify-end": userPhotoAlignment === "right",
+                })}>
+                  <Avatar style={{ width: currentAvatarSize, height: currentAvatarSize }}>
+                    <AvatarImage src={userPhotoUrl} alt={userName} />
+                    <AvatarFallback style={{ width: currentIconSize, height: currentIconSize }}>
+                      <User style={{ width: currentIconSize, height: currentIconSize }} />
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              )}
+              <div className="w-full sm:flex-1" style={containerStyle}>
+                {wishText && <p style={nameStyle}>{wishText}</p>}
+                <h3 className="font-bold" style={nameStyle}>{userName}</h3>
+                <p style={detailsStyle}>{email}</p>
+                <p style={detailsStyle}>{phone}</p>
+                {date && <p style={detailsStyle}>{date}</p>}
+              </div>
             </div>
           </div>
+        </div>
+        <div className="p-4 border-t flex items-center justify-end gap-2">
+          <Button variant="outline" onClick={handleSaveImage}>
+            <Download className="mr-2 h-4 w-4" />
+            Save
+          </Button>
+          <Button onClick={handleShareImage}>
+            <Share2 className="mr-2 h-4 w-4" />
+            Share
+          </Button>
         </div>
       </CardContent>
     </Card>

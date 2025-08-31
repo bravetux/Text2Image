@@ -124,10 +124,10 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
               </div>
             )}
             <div className="w-full sm:flex-1" style={containerStyle}>
+              {wishText && <p style={detailsStyle}>{wishText}</p>}
               <h3 className="font-bold" style={nameStyle}>{userName}</h3>
               <p style={detailsStyle}>{email}</p>
               <p style={detailsStyle}>{phone}</p>
-              {wishText && <p style={detailsStyle}>{wishText}</p>}
             </div>
           </div>
         </div>

@@ -2,7 +2,10 @@ import { useState, useRef } from "react";
 import { ImageGeneratorForm, ImageGeneratorFormValues } from "@/components/ImageGeneratorForm";
 import { GeneratedImage } from "@/components/GeneratedImage";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Camera } from "lucide-react";
+import { Camera, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [imageData, setImageData] = useState<ImageGeneratorFormValues | null>(null);
@@ -10,6 +13,12 @@ const Index = () => {
   const [userPhotoUrl, setUserPhotoUrl] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const generatedImageRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
+  };
 
   const handleFormSubmit = (values: ImageGeneratorFormValues) => {
     console.log("Form values:", values);
@@ -46,7 +55,13 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4 md:p-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4 md:p-8 relative">
+      <div className="absolute top-4 right-4">
+        <Button variant="outline" onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          Logout
+        </Button>
+      </div>
       <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         <div className="w-full">
           <ImageGeneratorForm onSubmit={handleFormSubmit} isGenerating={isGenerating} />

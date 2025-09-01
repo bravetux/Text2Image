@@ -63,31 +63,14 @@ const Index = () => {
       return;
     }
 
-    setIsGenerating(true);
+    setIsGenerating(false); // Set to false to show the component immediately
     setImageData(values);
-    setImageUrl("");
+    setImageUrl(values.backgroundImageUrl);
     setUserPhotoUrl("");
 
     if (values.userPhoto && values.userPhoto.length > 0) {
       setUserPhotoUrl(URL.createObjectURL(values.userPhoto[0]));
     }
-
-    const handleImageLoad = (url: string) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = url;
-      img.onload = () => {
-        setImageUrl(url);
-        setIsGenerating(false);
-      };
-      img.onerror = () => {
-        console.error("Failed to load image from URL:", url);
-        setImageUrl("https://via.placeholder.com/800x600?text=Image+Not+Found");
-        setIsGenerating(false);
-      };
-    };
-
-    handleImageLoad(values.backgroundImageUrl);
   };
 
   return (
@@ -135,14 +118,12 @@ const Index = () => {
         </div>
         
         <div className="w-full flex items-center justify-center md:sticky md:top-8">
-          {isGenerating && (
+          {isGenerating ? (
             <div className="w-full max-w-lg space-y-2">
               <Skeleton className="h-96 w-full rounded-t-xl" />
               <Skeleton className="h-[90px] w-full rounded-b-xl" />
             </div>
-          )}
-
-          {imageUrl && imageData && !isGenerating && (
+          ) : imageData ? (
             <div ref={generatedImageRef}>
               <GeneratedImage 
                 imageUrl={imageUrl}
@@ -162,9 +143,7 @@ const Index = () => {
                 date={imageData.date}
               />
             </div>
-          )}
-
-          {!isGenerating && !imageUrl && (
+          ) : (
             <div className="w-full max-w-lg h-96 flex flex-col items-center justify-center bg-gray-200 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700">
               <Camera className="h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
               <p className="text-gray-500 dark:text-ray-400 text-center p-4">

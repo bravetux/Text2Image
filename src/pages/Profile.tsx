@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -24,6 +24,8 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 const Profile = () => {
   const { session, loading: sessionLoading } = useSession();
   const navigate = useNavigate();
+  const [subscription, setSubscription] = useState<{ plan: string | null; status: string | null }>({ plan: null, status: null });
+  const [isSubscribing, setIsSubscribing] = useState(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -46,7 +48,7 @@ const Profile = () => {
         try {
           const { data, error } = await supabase
             .from('profiles')
-            .select('first_name, last_name, phone')
+            .select('first_name, last_name, phone, subscription_plan, subscription_status')
             .eq('id', session.user.id)
             .single();
 
@@ -56,9 +58,11 @@ const Profile = () => {
 
           if (data) {
             form.reset({
-              ...data,
+              first_name: data.first_name || '',
+              last_name: data.last_name || '',
               phone: data.phone || session.user.phone || '',
             });
+            setSubscription({ plan: data.subscription_plan, status: data.subscription_status });
           } else {
             form.reset({
               first_name: '',
@@ -83,7 +87,6 @@ const Profile = () => {
 
     const toastId = showLoading('Updating profile...');
     try {
-      // First, upsert the public profiles table, which is the primary data source for the app
       const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
@@ -98,9 +101,6 @@ const Profile = () => {
 
       if (profileError) throw profileError;
 
-      // If profile update is successful, then try to update the auth user.
-      // This is secondary and might fail due to security policies (e.g., requiring re-authentication).
-      // We'll log the error but won't block the user from seeing a success message for the main profile update.
       const { error: authError } = await supabase.auth.updateUser({
         phone: values.phone,
       });
@@ -115,6 +115,39 @@ const Profile = () => {
       dismissToast(toastId);
       showError('Failed to update profile.');
       console.error('Error updating profile:', error);
+    }
+  };
+
+  const handleSubscribe = async (planName: string) => {
+    if (!session) return;
+    setIsSubscribing(true);
+    const toastId = showLoading(`Subscribing to ${planName} plan...`);
+
+    const expiresAt = new Date();
+    expiresAt.setMonth(expiresAt.getMonth() + 1);
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          subscription_plan: planName,
+          subscription_status: 'active',
+          subscribed_at: new Date().toISOString(),
+          subscription_expires_at: expiresAt.toISOString(),
+        })
+        .eq('id', session.user.id);
+
+      if (error) throw error;
+
+      setSubscription({ plan: planName, status: 'active' });
+      dismissToast(toastId);
+      showSuccess(`Successfully subscribed to the ${planName} plan!`);
+    } catch (error) {
+      dismissToast(toastId);
+      showError('Failed to update subscription.');
+      console.error('Error updating subscription:', error);
+    } finally {
+      setIsSubscribing(false);
     }
   };
 
@@ -207,7 +240,11 @@ const Profile = () => {
           </Form>
         </CardContent>
       </Card>
-      <SubscriptionPlans />
+      <SubscriptionPlans 
+        currentPlan={subscription.plan}
+        onSubscribe={handleSubscribe}
+        isSubscribing={isSubscribing}
+      />
     </div>
   );
 };

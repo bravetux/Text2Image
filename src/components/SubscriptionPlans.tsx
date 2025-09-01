@@ -20,7 +20,13 @@ const plans = [
   },
 ];
 
-const SubscriptionPlans = () => {
+interface SubscriptionPlansProps {
+  currentPlan: string | null;
+  onSubscribe: (planName: string) => Promise<void>;
+  isSubscribing: boolean;
+}
+
+const SubscriptionPlans = ({ currentPlan, onSubscribe, isSubscribing }: SubscriptionPlansProps) => {
   return (
     <Card className="w-full max-w-md mt-8">
       <CardHeader>
@@ -28,25 +34,33 @@ const SubscriptionPlans = () => {
         <CardDescription>Choose a plan that works for you.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {plans.map((plan) => (
-          <Card key={plan.name} className="p-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-semibold">{plan.name}</h3>
-                <p className="text-2xl font-bold">₹{plan.price}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+        {plans.map((plan) => {
+          const isCurrentPlan = plan.name === currentPlan;
+          return (
+            <Card key={plan.name} className="p-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-semibold">{plan.name}</h3>
+                  <p className="text-2xl font-bold">₹{plan.price}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                </div>
+                <Button
+                  onClick={() => onSubscribe(plan.name)}
+                  disabled={isCurrentPlan || isSubscribing}
+                >
+                  {isSubscribing ? 'Processing...' : (isCurrentPlan ? "Current Plan" : "Subscribe")}
+                </Button>
               </div>
-              <Button>Subscribe</Button>
-            </div>
-            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              {plan.features.map((feature) => (
-                <li key={feature} className="flex items-center">
-                  <Check className="h-4 w-4 mr-2 text-green-500" />
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </Card>
-        ))}
+              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-center">
+                    <Check className="h-4 w-4 mr-2 text-green-500" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          );
+        })}
       </CardContent>
     </Card>
   );

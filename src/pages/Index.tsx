@@ -32,7 +32,7 @@ const Index = () => {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name')
+        .select('first_name, last_name, phone')
         .eq('id', session.user.id)
         .single();
 
@@ -45,7 +45,7 @@ const Index = () => {
       setProfileData({
         userName: userName,
         email: session.user.email || '',
-        phone: session.user.phone || '',
+        phone: data?.phone || session.user.phone || '',
       });
     };
 

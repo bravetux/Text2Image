@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "@/context/SessionContext";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { showError } from "@/utils/toast";
 
 interface ProfileData {
   userName: string;
@@ -57,6 +58,11 @@ const Index = () => {
   };
 
   const handleFormSubmit = (values: ImageGeneratorFormValues) => {
+    if (!values.backgroundImageUrl) {
+      showError("Please select a background image before generating.");
+      return;
+    }
+
     setIsGenerating(true);
     setImageData(values);
     setImageUrl("");
@@ -68,7 +74,7 @@ const Index = () => {
 
     const handleImageLoad = (url: string) => {
       const img = new Image();
-      img.crossOrigin = "anonymous"; // Important for loading images from other domains
+      img.crossOrigin = "anonymous";
       img.src = url;
       img.onload = () => {
         setImageUrl(url);
@@ -81,13 +87,7 @@ const Index = () => {
       };
     };
 
-    if (values.backgroundImageUrl) {
-      handleImageLoad(values.backgroundImageUrl);
-    } else {
-      const query = 'nature';
-      const newImageUrl = `https://source.unsplash.com/800x600/?${query}&t=${new Date().getTime()}`;
-      handleImageLoad(newImageUrl);
-    }
+    handleImageLoad(values.backgroundImageUrl);
   };
 
   return (

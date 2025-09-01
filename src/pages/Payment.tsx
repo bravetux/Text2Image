@@ -32,19 +32,11 @@ const Payment = () => {
       dismissToast(toastId);
       const paymentToastId = showLoading("Verifying payment and updating subscription...");
       
-      const expiresAt = new Date();
-      expiresAt.setMonth(expiresAt.getMonth() + 1);
-
       try {
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            subscription_plan: planName,
-            subscription_status: 'active',
-            subscribed_at: new Date().toISOString(),
-            subscription_expires_at: expiresAt.toISOString(),
-          })
-          .eq('id', session.user.id);
+        const { error } = await supabase.rpc('update_user_subscription', {
+          user_id_to_update: session.user.id,
+          new_plan_name: planName,
+        });
 
         if (error) throw error;
 

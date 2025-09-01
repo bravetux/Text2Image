@@ -6,12 +6,12 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 
-interface FtpImageSelectorProps {
+interface BackgroundImageSelectorProps {
   onImageSelect: (url: string) => void;
   selectedValue?: string;
 }
 
-export const FtpImageSelector = ({ onImageSelect, selectedValue }: FtpImageSelectorProps) => {
+export const BackgroundImageSelector = ({ onImageSelect, selectedValue }: BackgroundImageSelectorProps) => {
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +21,7 @@ export const FtpImageSelector = ({ onImageSelect, selectedValue }: FtpImageSelec
       setLoading(true);
       setError(null);
       try {
-        const { data, error: functionError } = await supabase.functions.invoke('list-ftp-images');
+        const { data, error: functionError } = await supabase.functions.invoke('list-http-images');
         
         if (functionError) {
           throw new Error(functionError.message);
@@ -33,7 +33,7 @@ export const FtpImageSelector = ({ onImageSelect, selectedValue }: FtpImageSelec
 
         setImages(data.images || []);
       } catch (e: any) {
-        console.error("Failed to fetch FTP images:", e);
+        console.error("Failed to fetch HTTP images:", e);
         setError("Could not load background images. Please try again later.");
       } finally {
         setLoading(false);

@@ -24,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Slider } from "./ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { Switch } from "./ui/switch";
-import { FtpImageSelector } from "./FtpImageSelector";
+import { BackgroundImageSelector } from "./BackgroundImageSelector";
 
 const formSchema = z.object({
   userName: z.string().min(2, "Your name must be at least 2 characters."),
@@ -258,7 +258,7 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, initialValues }: Im
                   <FormLabel className="text-right pr-2 pt-2">Background Image</FormLabel>
                   <div className="col-span-2">
                     <FormControl>
-                      <FtpImageSelector 
+                      <BackgroundImageSelector 
                         onImageSelect={field.onChange}
                         selectedValue={field.value}
                       />

@@ -68,20 +68,21 @@ const Index = () => {
 
     const handleImageLoad = (url: string) => {
       const img = new Image();
+      img.crossOrigin = "anonymous"; // Important for loading images from other domains
       img.src = url;
       img.onload = () => {
         setImageUrl(url);
         setIsGenerating(false);
       };
       img.onerror = () => {
+        console.error("Failed to load image from URL:", url);
         setImageUrl("https://via.placeholder.com/800x600?text=Image+Not+Found");
         setIsGenerating(false);
       };
     };
 
-    if (values.backgroundImage && values.backgroundImage.length > 0) {
-      const newImageUrl = URL.createObjectURL(values.backgroundImage[0]);
-      handleImageLoad(newImageUrl);
+    if (values.backgroundImageUrl) {
+      handleImageLoad(values.backgroundImageUrl);
     } else {
       const query = 'nature';
       const newImageUrl = `https://source.unsplash.com/800x600/?${query}&t=${new Date().getTime()}`;

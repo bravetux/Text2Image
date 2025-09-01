@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,7 +11,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { showLoading, showSuccess, showError, dismissToast } from '@/utils/toast';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import SubscriptionPlans from '@/components/SubscriptionPlans';
 
 const profileSchema = z.object({
   first_name: z.string().min(1, 'First name is required'),
@@ -24,8 +23,6 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 const Profile = () => {
   const { session, loading: sessionLoading } = useSession();
   const navigate = useNavigate();
-  const [subscription, setSubscription] = useState<{ plan: string | null; status: string | null }>({ plan: null, status: null });
-  const [isSubscribing, setIsSubscribing] = useState(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -48,7 +45,7 @@ const Profile = () => {
         try {
           const { data, error } = await supabase
             .from('profiles')
-            .select('first_name, last_name, phone, subscription_plan, subscription_status')
+            .select('first_name, last_name, phone')
             .eq('id', session.user.id)
             .single();
 
@@ -62,7 +59,6 @@ const Profile = () => {
               last_name: data.last_name || '',
               phone: data.phone || session.user.phone || '',
             });
-            setSubscription({ plan: data.subscription_plan, status: data.subscription_status });
           } else {
             form.reset({
               first_name: '',
@@ -115,39 +111,6 @@ const Profile = () => {
       dismissToast(toastId);
       showError('Failed to update profile.');
       console.error('Error updating profile:', error);
-    }
-  };
-
-  const handleSubscribe = async (planName: string) => {
-    if (!session) return;
-    setIsSubscribing(true);
-    const toastId = showLoading(`Subscribing to ${planName} plan...`);
-
-    const expiresAt = new Date();
-    expiresAt.setMonth(expiresAt.getMonth() + 1);
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          subscription_plan: planName,
-          subscription_status: 'active',
-          subscribed_at: new Date().toISOString(),
-          subscription_expires_at: expiresAt.toISOString(),
-        })
-        .eq('id', session.user.id);
-
-      if (error) throw error;
-
-      setSubscription({ plan: planName, status: 'active' });
-      dismissToast(toastId);
-      showSuccess(`Successfully subscribed to the ${planName} plan!`);
-    } catch (error) {
-      dismissToast(toastId);
-      showError('Failed to update subscription.');
-      console.error('Error updating subscription:', error);
-    } finally {
-      setIsSubscribing(false);
     }
   };
 
@@ -240,11 +203,9 @@ const Profile = () => {
           </Form>
         </CardContent>
       </Card>
-      <SubscriptionPlans 
-        currentPlan={subscription.plan}
-        onSubscribe={handleSubscribe}
-        isSubscribing={isSubscribing}
-      />
+      <Button variant="secondary" onClick={() => navigate('/subscriptions')} className="mt-4 w-full max-w-md">
+        Manage Subscription
+      </Button>
     </div>
   );
 };

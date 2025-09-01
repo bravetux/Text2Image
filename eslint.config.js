@@ -1,29 +1,58 @@
-import js from "@eslint/js";
 import globals from "globals";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
+import pluginReact from "eslint-plugin-react";
+import hooksPlugin from "eslint-plugin-react-hooks";
+import refreshPlugin from "eslint-plugin-react-refresh";
+import js from "@eslint/js";
 
-export default tseslint.config(
-  { ignores: ["dist"] },
-  {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ["**/*.{ts,tsx}"],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+// This is the configuration for the React application source code
+const reactAppConfig = {
+  files: ["src/**/*.{ts,tsx}"],
+  plugins: {
+    react: pluginReact,
+    "react-hooks": hooksPlugin,
+    "react-refresh": refreshPlugin,
+  },
+  languageOptions: {
+    globals: {
+      ...globals.browser,
     },
-    plugins: {
-      "react-hooks": reactHooks,
-      "react-refresh": reactRefresh,
-    },
-    rules: {
-      ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
-      "@typescript-eslint/no-unused-vars": "off",
+    parser: tseslint.parser,
+    parserOptions: {
+      ecmaFeatures: { jsx: true },
+      project: "./tsconfig.json",
     },
   },
-);
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
+  rules: {
+    ...js.configs.recommended.rules,
+    ...tseslint.configs.recommended.rules,
+    ...pluginReact.configs.recommended.rules,
+    "react/react-in-jsx-scope": "off",
+    ...hooksPlugin.configs.recommended.rules,
+    "react-refresh/only-export-components": "warn",
+  },
+};
+
+export default [
+  {
+    // Global ignores for all configurations
+    ignores: [
+      "dist",
+      "node_modules",
+      "supabase",
+      "android",
+      "ios",
+      ".capacitor",
+      "*.config.js",
+      "*.config.ts",
+      "components.json",
+    ],
+  },
+  // Apply the detailed React app configuration
+  reactAppConfig,
+];

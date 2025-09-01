@@ -36,7 +36,7 @@ serve(async (req) => {
       user: ftpUser,
       password: ftpPassword,
       port: 21,
-      secure: false
+      secure: 'explicit'
     });
 
     const currentMonth = new Date().getMonth() + 1;

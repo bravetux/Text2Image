@@ -1,11 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { Client } from 'https://esm.sh/basic-ftp@5.0.5'
 
-// IMPORTANT: You must configure this base URL to match your public CDN or file server.
+// The base URL for images is now configured via the `FTP_IMAGE_BASE_URL` secret.
 // This is the public web address where your FTP images can be accessed.
-// Replace "https://your-public-url.com/path/to/images/" with your actual URL.
 // Example: "https://cdn.bravetux.com/"
-const IMAGE_BASE_URL = "https://your-public-url.com/path/to/images/";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,10 +19,11 @@ serve(async (req) => {
     const ftpHost = Deno.env.get("FTP_HOST");
     const ftpUser = Deno.env.get("FTP_USER");
     const ftpPassword = Deno.env.get("FTP_PASSWORD");
+    const imageBaseUrl = Deno.env.get("FTP_IMAGE_BASE_URL");
 
-    if (!ftpHost || !ftpUser || !ftpPassword) {
-      console.error("FTP credentials are not set in environment variables.");
-      return new Response(JSON.stringify({ error: "FTP configuration is missing on the server. Please ensure secrets are set." }), {
+    if (!ftpHost || !ftpUser || !ftpPassword || !imageBaseUrl) {
+      console.error("FTP credentials or image base URL are not set in environment variables.");
+      return new Response(JSON.stringify({ error: "FTP configuration is missing on the server. Please ensure all required secrets are set." }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -55,7 +54,7 @@ serve(async (req) => {
     const imageFiles = files
       .map(file => file.name)
       .filter(fileName => /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName))
-      .map(fileName => `${IMAGE_BASE_URL}${currentMonth}/${fileName}`);
+      .map(fileName => `${imageBaseUrl}${currentMonth}/${fileName}`);
 
     return new Response(JSON.stringify({ images: imageFiles }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

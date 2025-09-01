@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
-import { FTPClient } from "https://deno.land/x/ftp@v2.1.0/mod.ts";
+import { Client } from 'https://esm.sh/basic-ftp@5.0.5'
 
 // IMPORTANT: You must configure this base URL to match your public CDN or file server.
 // This is the public web address where your FTP images can be accessed.
@@ -30,30 +30,32 @@ serve(async (req) => {
       });
     }
 
-    const ftp = new FTPClient(ftpHost, {
+    const client = new Client();
+    await client.access({
+      host: ftpHost,
       user: ftpUser,
-      pass: ftpPassword,
+      password: ftpPassword,
       port: 21,
+      secure: false
     });
-
-    await ftp.connect();
 
     const currentMonth = new Date().getMonth() + 1;
     const directory = `/${currentMonth}`;
     
-    let files: string[] = [];
+    let files: { name: string }[] = [];
     try {
-      files = await ftp.list(directory);
+      files = await client.list(directory);
     } catch (listError) {
       console.warn(`Could not list files in directory ${directory}:`, listError.message);
       files = [];
     } finally {
-      await ftp.close();
+      client.close();
     }
     
     const imageFiles = files
-      .filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
-      .map(file => `${IMAGE_BASE_URL}${currentMonth}/${file}`);
+      .map(file => file.name)
+      .filter(fileName => /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName))
+      .map(fileName => `${IMAGE_BASE_URL}${currentMonth}/${fileName}`);
 
     return new Response(JSON.stringify({ images: imageFiles }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

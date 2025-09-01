@@ -86,6 +86,7 @@ export const BackgroundImageSelector = ({ onImageSelect, selectedValue }: Backgr
               src={imageUrl}
               alt="Background option"
               className="h-24 w-24 object-cover rounded-md"
+              onContextMenu={(e) => e.preventDefault()}
             />
           </button>
         ))}

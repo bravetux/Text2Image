@@ -95,9 +95,14 @@ const Subscriptions = () => {
         onSubscribe={handleChoosePlan}
         isSubscribing={false} // This will be handled on the payment page
       />
-      <Button variant="outline" onClick={() => navigate('/profile')} className="mt-4">
-        Back to Profile
-      </Button>
+      <div className="flex gap-2 mt-4 w-full max-w-md">
+        <Button variant="outline" onClick={() => navigate('/')} className="w-full">
+          Home
+        </Button>
+        <Button variant="outline" onClick={() => navigate('/profile')} className="w-full">
+          Back to Profile
+        </Button>
+      </div>
     </div>
   );
 };

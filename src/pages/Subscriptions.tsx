@@ -3,16 +3,22 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/context/SessionContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { showLoading, showSuccess, showError, dismissToast } from '@/utils/toast';
+import { showError } from '@/utils/toast';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import SubscriptionPlans from '@/components/SubscriptionPlans';
 
+interface SubscriptionDetails {
+  plan: string | null;
+  status: string | null;
+  subscribed_at: string | null;
+  expires_at: string | null;
+}
+
 const Subscriptions = () => {
   const { session, loading: sessionLoading } = useSession();
   const navigate = useNavigate();
-  const [subscription, setSubscription] = useState<{ plan: string | null; status: string | null }>({ plan: null, status: null });
-  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscription, setSubscription] = useState<SubscriptionDetails>({ plan: null, status: null, subscribed_at: null, expires_at: null });
 
   useEffect(() => {
     if (!sessionLoading && !session) {
@@ -24,7 +30,7 @@ const Subscriptions = () => {
       const fetchSubscription = async () => {
         const { data, error } = await supabase
           .from('profiles')
-          .select('subscription_plan, subscription_status')
+          .select('subscription_plan, subscription_status, subscribed_at, subscription_expires_at')
           .eq('id', session.user.id)
           .single();
 
@@ -34,7 +40,12 @@ const Subscriptions = () => {
         }
 
         if (data) {
-          setSubscription({ plan: data.subscription_plan, status: data.subscription_status });
+          setSubscription({ 
+            plan: data.subscription_plan, 
+            status: data.subscription_status,
+            subscribed_at: data.subscribed_at,
+            expires_at: data.subscription_expires_at,
+          });
         }
       };
 
@@ -42,37 +53,8 @@ const Subscriptions = () => {
     }
   }, [session, sessionLoading, navigate]);
 
-  const handleSubscribe = async (planName: string) => {
-    if (!session) return;
-    setIsSubscribing(true);
-    const toastId = showLoading(`Subscribing to ${planName} plan...`);
-
-    const expiresAt = new Date();
-    expiresAt.setMonth(expiresAt.getMonth() + 1);
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          subscription_plan: planName,
-          subscription_status: 'active',
-          subscribed_at: new Date().toISOString(),
-          subscription_expires_at: expiresAt.toISOString(),
-        })
-        .eq('id', session.user.id);
-
-      if (error) throw error;
-
-      setSubscription({ plan: planName, status: 'active' });
-      dismissToast(toastId);
-      showSuccess(`Successfully subscribed to the ${planName} plan!`);
-    } catch (error) {
-      dismissToast(toastId);
-      showError('Failed to update subscription.');
-      console.error('Error updating subscription:', error);
-    } finally {
-      setIsSubscribing(false);
-    }
+  const handleChoosePlan = (planName: string, price: number) => {
+    navigate('/payment', { state: { planName, price } });
   };
 
   if (sessionLoading || !session) {
@@ -95,10 +77,23 @@ const Subscriptions = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+      {subscription.status === 'active' && subscription.plan && (
+        <Card className="w-full max-w-md mb-8">
+          <CardHeader>
+            <CardTitle>Your Current Subscription</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p><strong>Plan:</strong> {subscription.plan}</p>
+            <p><strong>Status:</strong> <span className="text-green-500 font-semibold">{subscription.status}</span></p>
+            {subscription.subscribed_at && <p><strong>Subscribed On:</strong> {new Date(subscription.subscribed_at).toLocaleDateString()}</p>}
+            {subscription.expires_at && <p><strong>Expires On:</strong> {new Date(subscription.expires_at).toLocaleDateString()}</p>}
+          </CardContent>
+        </Card>
+      )}
       <SubscriptionPlans 
         currentPlan={subscription.plan}
-        onSubscribe={handleSubscribe}
-        isSubscribing={isSubscribing}
+        onSubscribe={handleChoosePlan}
+        isSubscribing={false} // This will be handled on the payment page
       />
       <Button variant="outline" onClick={() => navigate('/profile')} className="mt-4">
         Back to Profile

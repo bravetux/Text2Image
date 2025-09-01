@@ -22,7 +22,7 @@ const plans = [
 
 interface SubscriptionPlansProps {
   currentPlan: string | null;
-  onSubscribe: (planName: string) => Promise<void>;
+  onSubscribe: (planName: string, price: number) => void;
   isSubscribing: boolean;
 }
 
@@ -44,7 +44,7 @@ const SubscriptionPlans = ({ currentPlan, onSubscribe, isSubscribing }: Subscrip
                   <p className="text-2xl font-bold">₹{plan.price}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                 </div>
                 <Button
-                  onClick={() => onSubscribe(plan.name)}
+                  onClick={() => onSubscribe(plan.name, plan.price)}
                   disabled={isCurrentPlan || isSubscribing}
                 >
                   {isSubscribing ? 'Processing...' : (isCurrentPlan ? "Current Plan" : "Subscribe")}

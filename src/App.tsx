@@ -8,7 +8,8 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Subscriptions from "./pages/Subscriptions";
-import Payment from "./pages/Payment"; // Import the new Payment page
+import Payment from "./pages/Payment";
+import Support from "./pages/Support"; // Import the new Support page
 import { SessionProvider, useSession } from "./context/SessionContext";
 import { Skeleton } from "./components/ui/skeleton";
 
@@ -43,6 +44,10 @@ const AppRoutes = () => {
       <Route 
         path="/payment" 
         element={session ? <Payment /> : <Navigate to="/login" replace />} 
+      />
+      <Route 
+        path="/support" 
+        element={session ? <Support /> : <Navigate to="/login" replace />} 
       />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />

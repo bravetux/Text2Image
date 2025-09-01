@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { ImageGeneratorForm, ImageGeneratorFormValues } from "@/components/ImageGeneratorForm";
 import { GeneratedImage } from "@/components/GeneratedImage";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Camera, CreditCard, LogOut, User } from "lucide-react";
+import { Camera, CreditCard, LogOut, User, LifeBuoy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -92,6 +92,10 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4 md:p-8 relative">
       <div className="absolute top-4 right-4 flex gap-2">
+        <Button variant="outline" onClick={() => navigate('/support')}>
+          <LifeBuoy className="mr-2 h-4 w-4" />
+          Support
+        </Button>
         <Button variant="outline" onClick={() => navigate('/profile')}>
           <User className="mr-2 h-4 w-4" />
           Profile

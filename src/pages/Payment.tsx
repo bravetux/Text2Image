@@ -6,13 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { showLoading, showSuccess, showError, dismissToast } from '@/utils/toast';
 
-// Extend the Window interface to include Razorpay
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
-
 const Payment = () => {
   const { session } = useSession();
   const navigate = useNavigate();
@@ -32,67 +25,38 @@ const Payment = () => {
       return;
     }
 
-    const toastId = showLoading("Initializing payment...");
+    const toastId = showLoading("Processing dummy payment...");
 
-    const options = {
-      key: 'YOUR_RAZORPAY_KEY_ID', // IMPORTANT: Replace with your Razorpay Key ID
-      amount: price * 100, // Amount in the smallest currency unit (e.g., paise for INR)
-      currency: 'INR',
-      name: 'Image Generator Subscription',
-      description: `Payment for ${planName} Plan`,
-      handler: async (response: any) => {
-        dismissToast(toastId);
-        const paymentToastId = showLoading("Verifying payment and updating subscription...");
-        
-        // In a real app, you'd verify the payment signature on your backend.
-        // For this example, we'll assume payment is successful and update the DB.
-        
-        const expiresAt = new Date();
-        expiresAt.setMonth(expiresAt.getMonth() + 1);
-
-        try {
-          const { error } = await supabase
-            .from('profiles')
-            .update({
-              subscription_plan: planName,
-              subscription_status: 'active',
-              subscribed_at: new Date().toISOString(),
-              subscription_expires_at: expiresAt.toISOString(),
-            })
-            .eq('id', session.user.id);
-
-          if (error) throw error;
-
-          dismissToast(paymentToastId);
-          showSuccess(`Successfully subscribed to the ${planName} plan!`);
-          navigate('/subscriptions');
-        } catch (error) {
-          dismissToast(paymentToastId);
-          showError('Failed to update subscription after payment.');
-          console.error('Error updating subscription:', error);
-        }
-      },
-      prefill: {
-        email: session.user.email,
-        contact: session.user.phone,
-      },
-      notes: {
-        user_id: session.user.id,
-      },
-      theme: {
-        color: '#3399cc',
-      },
-    };
-
-    try {
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+    // Simulate a 2-second payment processing delay
+    setTimeout(async () => {
       dismissToast(toastId);
-    } catch (error) {
-      dismissToast(toastId);
-      showError("Failed to initialize Razorpay checkout.");
-      console.error("Razorpay error:", error);
-    }
+      const paymentToastId = showLoading("Verifying payment and updating subscription...");
+      
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + 1);
+
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            subscription_plan: planName,
+            subscription_status: 'active',
+            subscribed_at: new Date().toISOString(),
+            subscription_expires_at: expiresAt.toISOString(),
+          })
+          .eq('id', session.user.id);
+
+        if (error) throw error;
+
+        dismissToast(paymentToastId);
+        showSuccess(`Successfully subscribed to the ${planName} plan!`);
+        navigate('/subscriptions');
+      } catch (error) {
+        dismissToast(paymentToastId);
+        showError('Failed to update subscription after dummy payment.');
+        console.error('Error updating subscription:', error);
+      }
+    }, 2000);
   };
 
   if (!planName || !price) {

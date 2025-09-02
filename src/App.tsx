@@ -2,58 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import Login from "./pages/Login";
-import Profile from "./pages/Profile";
-import Subscriptions from "./pages/Subscriptions";
-import Payment from "./pages/Payment";
-import Support from "./pages/Support"; // Import the new Support page
-import { SessionProvider, useSession } from "./context/SessionContext";
-import { Skeleton } from "./components/ui/skeleton";
+import Support from "./pages/Support";
 
 const queryClient = new QueryClient();
-
-const AppRoutes = () => {
-  const { session, loading } = useSession();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Skeleton className="h-20 w-20 rounded-full" />
-      </div>
-    );
-  }
-
-  return (
-    <Routes>
-      <Route path="/login" element={!session ? <Login /> : <Navigate to="/" replace />} />
-      <Route 
-        path="/" 
-        element={session ? <Index /> : <Navigate to="/login" replace />} 
-      />
-      <Route 
-        path="/profile" 
-        element={session ? <Profile /> : <Navigate to="/login" replace />} 
-      />
-      <Route 
-        path="/subscriptions" 
-        element={session ? <Subscriptions /> : <Navigate to="/login" replace />} 
-      />
-      <Route 
-        path="/payment" 
-        element={session ? <Payment /> : <Navigate to="/login" replace />} 
-      />
-      <Route 
-        path="/support" 
-        element={session ? <Support /> : <Navigate to="/login" replace />} 
-      />
-      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
-};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -61,9 +15,11 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <SessionProvider>
-          <AppRoutes />
-        </SessionProvider>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

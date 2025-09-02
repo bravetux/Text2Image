@@ -50,11 +50,6 @@ export type ImageGeneratorFormValues = z.infer<typeof formSchema>;
 interface ImageGeneratorFormProps {
   onSubmit: (values: ImageGeneratorFormValues) => void;
   isGenerating: boolean;
-  initialValues?: {
-    userName: string;
-    email: string;
-    phone: string;
-  };
 }
 
 const LOCAL_STORAGE_KEY = "imageGeneratorFormData";
@@ -89,7 +84,7 @@ const defaultValues = {
   swapImageAndText: false,
 };
 
-export function ImageGeneratorForm({ onSubmit, isGenerating, initialValues }: ImageGeneratorFormProps) {
+export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFormProps) {
   const [isTextOptionsOpen, setIsTextOptionsOpen] = useState(false);
   const [isImageOptionsOpen, setIsImageOptionsOpen] = useState(false);
   const [isLayoutOptionsOpen, setIsLayoutOptionsOpen] = useState(false);
@@ -99,13 +94,7 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, initialValues }: Im
     try {
       const item = window.localStorage.getItem(LOCAL_STORAGE_KEY);
       const parsedItem = item ? JSON.parse(item) : {};
-      const finalValues = { ...defaultValues, ...parsedItem, date: new Date().toLocaleDateString() };
-      if (initialValues) {
-        finalValues.userName = initialValues.userName;
-        finalValues.email = initialValues.email;
-        finalValues.phone = initialValues.phone;
-      }
-      return finalValues;
+      return { ...defaultValues, ...parsedItem, date: new Date().toLocaleDateString() };
     } catch (error) {
       console.warn("Error reading localStorage:", error);
       return defaultValues;
@@ -128,17 +117,6 @@ export function ImageGeneratorForm({ onSubmit, isGenerating, initialValues }: Im
       console.warn("Error writing to localStorage:", error);
     }
   }, [JSON.stringify(watchedValues)]);
-
-  useEffect(() => {
-    if (initialValues) {
-      form.reset({
-        ...form.getValues(),
-        userName: initialValues.userName,
-        email: initialValues.email,
-        phone: initialValues.phone,
-      });
-    }
-  }, [initialValues, form]);
 
   return (
     <Card className="w-full max-w-lg">

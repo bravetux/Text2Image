@@ -126,7 +126,6 @@ const Index = () => {
           ) : imageData ? (
             <div ref={generatedImageRef}>
               <GeneratedImage 
-                key={imageUrl}
                 imageUrl={imageUrl}
                 userName={imageData.userName}
                 email={imageData.email}

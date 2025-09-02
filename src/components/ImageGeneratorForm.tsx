@@ -33,7 +33,6 @@ const formSchema = z.object({
   customWish: z.string().optional(),
   backgroundImageFile: z.custom<FileList>().optional(),
   userPhoto: z.custom<FileList>().optional(),
-  date: z.string().optional(),
   fontSize: z.number().min(8).max(72).default(18),
   textAlign: z.enum(["left", "center", "right"]).default("left"),
   fontFamily: z.string().default("Arial"),
@@ -71,7 +70,6 @@ const defaultValues = {
   phone: "",
   wish: "Birthday",
   customWish: wishMap["Birthday"],
-  date: new Date().toLocaleDateString(),
   fontSize: 18,
   textAlign: "left",
   fontFamily: "Roboto",
@@ -92,7 +90,7 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
     try {
       const item = window.localStorage.getItem(LOCAL_STORAGE_KEY);
       const parsedItem = item ? JSON.parse(item) : {};
-      return { ...defaultValues, ...parsedItem, date: new Date().toLocaleDateString() };
+      return { ...defaultValues, ...parsedItem };
     } catch (error) {
       console.warn("Error reading localStorage:", error);
       return defaultValues;
@@ -264,21 +262,6 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
                         onBlur={onBlur}
                         onChange={(e) => onChange(e.target.files)}
                       />
-                    </FormControl>
-                    <FormMessage className="mt-1" />
-                  </div>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem className="grid grid-cols-3 items-center gap-x-1">
-                  <FormLabel className="text-right pr-2">Date</FormLabel>
-                  <div className="col-span-2">
-                    <FormControl>
-                      <Input placeholder="MM/DD/YYYY" {...field} />
                     </FormControl>
                     <FormMessage className="mt-1" />
                   </div>

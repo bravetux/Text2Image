@@ -66,7 +66,7 @@ const Index = () => {
           />
         </div>
         
-        <div className="w-full flex items-center justify-center md:sticky md:top-8">
+        <div className="w-full flex items-center justify-center md:sticky md-top-8">
           {isGenerating ? (
             <div className="w-full max-w-lg space-y-2">
               <Skeleton className="h-96 w-full rounded-t-xl" />
@@ -89,7 +89,6 @@ const Index = () => {
                 swapImageAndText={imageData.swapImageAndText}
                 fontFamily={imageData.fontFamily}
                 backgroundColor={imageData.backgroundColor}
-                date={imageData.date}
               />
             </div>
           ) : (

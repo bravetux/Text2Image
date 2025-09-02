@@ -358,56 +358,16 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
                               <SelectValue placeholder="Select a font" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Abril Fatface">Abril Fatface</SelectItem>
-                              <SelectItem value="Alfa Slab One">Alfa Slab One</SelectItem>
-                              <SelectItem value="Anton">Anton</SelectItem>
-                              <SelectItem value="Arvo">Arvo</SelectItem>
-                              <SelectItem value="Bebas Neue">Bebas Neue</SelectItem>
-                              <SelectItem value="Bungee">Bungee</SelectItem>
-                              <SelectItem value="Cabin Sketch">Cabin Sketch</SelectItem>
-                              <SelectItem value="Caveat">Caveat</SelectItem>
-                              <SelectItem value="Chewy">Chewy</SelectItem>
-                              <SelectItem value="Comfortaa">Comfortaa</SelectItem>
-                              <SelectItem value="Cormorant Garamond">Cormorant Garamond</SelectItem>
-                              <SelectItem value="Creepster">Creepster</SelectItem>
-                              <SelectItem value="Crimson Text">Crimson Text</SelectItem>
-                              <SelectItem value="Dancing Script">Dancing Script</SelectItem>
-                              <SelectItem value="Fjalla One">Fjalla One</SelectItem>
-                              
-                              <SelectItem value="Fugaz One">Fugaz One</SelectItem>
-                              <SelectItem value="Great Vibes">Great Vibes</SelectItem>
-                              <SelectItem value="Indie Flower">Indie Flower</SelectItem>
-                              <SelectItem value="Josefin Sans">Josefin Sans</SelectItem>
-                              <SelectItem value="Jost">Jost</SelectItem>
-                              <SelectItem value="Kaushan Script">Kaushan Script</SelectItem>
-                              <SelectItem value="Lobster">Lobster</SelectItem>
-                              <SelectItem value="Lora">Lora</SelectItem>
-                              <SelectItem value="Luckiest Guy">Luckiest Guy</SelectItem>
-                              <SelectItem value="Merriweather">Merriweather</SelectItem>
-                              <SelectItem value="Montserrat">Montserrat</SelectItem>
-                              <SelectItem value="Mukta">Mukta</SelectItem>
-                              <SelectItem value="Nanum Pen Script">Nanum Pen Script</SelectItem>
-                              <SelectItem value="Nosifer">Nosifer</SelectItem>
-                              <SelectItem value="Nunito">Nunito</SelectItem>
-                              <SelectItem value="Open Sans">Open Sans</SelectItem>
-                              <SelectItem value="Oswald">Oswald</SelectItem>
-                              <SelectItem value="Pacifico">Pacifico</SelectItem>
-                              <SelectItem value="Patrick Hand">Patrick Hand</SelectItem>
-                              <SelectItem value="Playfair Display">Playfair Display</SelectItem>
-                              <SelectItem value="Poppins">Poppins</SelectItem>
-                              <SelectItem value="Press Start 2P">Press Start 2P</SelectItem>
-                              <SelectItem value="PT Sans">PT Sans</SelectItem>
-                              <SelectItem value="Raleway">Raleway</SelectItem>
-                              <SelectItem value="Righteous">Righteous</SelectItem>
                               <SelectItem value="Roboto">Roboto</SelectItem>
-                              <SelectItem value="Rock Salt">Rock Salt</SelectItem>
-                              <SelectItem value="Rubik">Rubik</SelectItem>
-                              <SelectItem value="Sacramento">Sacramento</SelectItem>
-                              <SelectItem value="Shadows Into Light">Shadows Into Light</SelectItem>
-                              <SelectItem value="Special Elite">Special Elite</SelectItem>
-                              <SelectItem value="Tangerine">Tangerine</SelectItem>
-                              <SelectItem value="Ubuntu">Ubuntu</SelectItem>
-                              <SelectItem value="Zeyada">Zeyada</SelectItem>
+                              <SelectItem value="Open Sans">Open Sans</SelectItem>
+                              <SelectItem value="Montserrat">Montserrat</SelectItem>
+                              <SelectItem value="Poppins">Poppins</SelectItem>
+                              <SelectItem value="Playfair Display">Playfair Display</SelectItem>
+                              <SelectItem value="Lora">Lora</SelectItem>
+                              <SelectItem value="Lobster">Lobster</SelectItem>
+                              <SelectItem value="Dancing Script">Dancing Script</SelectItem>
+                              <SelectItem value="Oswald">Oswald</SelectItem>
+                              <SelectItem value="Anton">Anton</SelectItem>
                             </SelectContent>
                           </Select>
                         </FormControl>

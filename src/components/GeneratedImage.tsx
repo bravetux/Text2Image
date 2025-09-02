@@ -5,7 +5,7 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import html2canvas from "html2canvas";
-import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
+import { showError, showSuccess } from "@/utils/toast";
 
 interface GeneratedImageProps {
   imageUrl: string;
@@ -73,44 +73,27 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
 
   const handleShareImage = async () => {
     if (!imageContentRef.current) return;
-    const toastId = showLoading("Preparing image for sharing...");
 
     try {
       const canvas = await html2canvas(imageContentRef.current, { useCORS: true });
       canvas.toBlob(async (blob) => {
         if (!blob) {
-          dismissToast(toastId);
           showError("Could not create image blob.");
           return;
         }
-
-        try {
-          const cache = await caches.open('generated-images-cache');
-          const cacheUrl = `generated-image-${Date.now()}.png`;
-          // Use blob.slice() to create a clone because the Response body is consumed
-          const responseToCache = new Response(blob.slice(), {
-            headers: { 'Content-Type': 'image/png' }
-          });
-          await cache.put(cacheUrl, responseToCache);
-        } catch (cacheError) {
-          console.warn("Could not cache the image, but will proceed with sharing.", cacheError);
-        }
-
         const file = new File([blob], "generated-image.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          dismissToast(toastId);
           await navigator.share({
             files: [file],
             title: 'My Generated Image',
             text: 'Check out this image I created!',
           });
+          showSuccess("Image shared successfully!");
         } else {
-          dismissToast(toastId);
           showError("Web Share API is not supported on your browser for sharing files.");
         }
       }, 'image/png');
     } catch (error) {
-      dismissToast(toastId);
       console.error("Sharing failed:", error);
       showError("Failed to share image.");
     }

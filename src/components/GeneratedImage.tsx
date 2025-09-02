@@ -62,7 +62,7 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
 
   const handleSaveImage = () => {
     if (imageContentRef.current) {
-      html2canvas(imageContentRef.current).then((canvas) => {
+      html2canvas(imageContentRef.current, { useCORS: true }).then((canvas) => {
         const link = document.createElement("a");
         link.download = "generated-image.png";
         link.href = canvas.toDataURL("image/png");
@@ -75,7 +75,7 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
     if (!imageContentRef.current) return;
 
     try {
-      const canvas = await html2canvas(imageContentRef.current);
+      const canvas = await html2canvas(imageContentRef.current, { useCORS: true });
       canvas.toBlob(async (blob) => {
         if (!blob) {
           showError("Could not create image blob.");
@@ -140,6 +140,7 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
                 src={imageUrl}
                 alt="Generated background"
                 className="w-full h-auto"
+                crossOrigin="anonymous"
               />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <span className="text-5xl font-extrabold text-gray-300 dark:text-gray-700 opacity-30 transform -rotate-45 select-none">

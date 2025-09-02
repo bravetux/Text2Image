@@ -30,6 +30,16 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
   const imageContentRef = useRef<HTMLDivElement>(null);
   const [renderedImageWidth, setRenderedImageWidth] = useState<number | undefined>(undefined);
 
+  const getProxiedImageUrl = (originalUrl: string) => {
+    if (!originalUrl || !originalUrl.startsWith('http')) {
+      return originalUrl;
+    }
+    const supabaseProjectUrl = "https://kfccagrpqidllhjqekmb.supabase.co";
+    return `${supabaseProjectUrl}/functions/v1/proxy-image?url=${encodeURIComponent(originalUrl)}`;
+  };
+
+  const proxiedImageUrl = getProxiedImageUrl(imageUrl);
+
   const calculateImageSize = useCallback(() => {
     const imageElement = imageRef.current;
     if (imageElement && imageElement.complete && imageElement.naturalWidth > 0) {
@@ -62,7 +72,7 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
 
   const handleSaveImage = () => {
     if (imageContentRef.current) {
-      html2canvas(imageContentRef.current).then((canvas) => {
+      html2canvas(imageContentRef.current, { useCORS: true }).then((canvas) => {
         const link = document.createElement("a");
         link.download = "generated-image.png";
         link.href = canvas.toDataURL("image/png");
@@ -75,7 +85,7 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
     if (!imageContentRef.current) return;
 
     try {
-      const canvas = await html2canvas(imageContentRef.current);
+      const canvas = await html2canvas(imageContentRef.current, { useCORS: true });
       canvas.toBlob(async (blob) => {
         if (!blob) {
           showError("Could not create image blob.");
@@ -137,9 +147,10 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
             <div className="bg-gray-200 dark:bg-gray-800 w-full relative">
               <img
                 ref={imageRef}
-                src={imageUrl}
+                src={proxiedImageUrl}
                 alt="Generated background"
                 className="w-full h-auto"
+                crossOrigin="anonymous"
               />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <span className="text-5xl font-extrabold text-gray-300 dark:text-gray-700 opacity-30 transform -rotate-45 select-none">

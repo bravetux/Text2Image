@@ -24,7 +24,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Slider } from "./ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { Switch } from "./ui/switch";
-import { BackgroundImageSelector } from "./BackgroundImageSelector";
 
 const formSchema = z.object({
   userName: z.string().min(2, "Your name must be at least 2 characters."),
@@ -32,7 +31,7 @@ const formSchema = z.object({
   phone: z.string().min(10, "Please enter a valid phone number."),
   wish: z.string().optional(),
   customWish: z.string().optional(),
-  backgroundImageUrl: z.string().optional(),
+  backgroundImageFile: z.custom<FileList>().optional(),
   userPhoto: z.custom<FileList>().optional(),
   date: z.string().optional(),
   fontSize: z.number().min(8).max(72).default(18),
@@ -72,7 +71,6 @@ const defaultValues = {
   phone: "",
   wish: "Birthday",
   customWish: wishMap["Birthday"],
-  backgroundImageUrl: "",
   date: new Date().toLocaleDateString(),
   fontSize: 18,
   textAlign: "left",
@@ -111,7 +109,7 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
 
   useEffect(() => {
     try {
-      const { userPhoto, ...valuesToSave } = watchedValues;
+      const { userPhoto, backgroundImageFile, ...valuesToSave } = watchedValues;
       window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(valuesToSave));
     } catch (error) {
       console.warn("Error writing to localStorage:", error);
@@ -230,15 +228,19 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
             />
             <FormField
               control={form.control}
-              name="backgroundImageUrl"
-              render={({ field }) => (
-                <FormItem className="grid grid-cols-3 items-start gap-x-1">
-                  <FormLabel className="text-right pr-2 pt-2">Background Image</FormLabel>
+              name="backgroundImageFile"
+              render={({ field: { onChange, onBlur, name, ref } }) => (
+                <FormItem className="grid grid-cols-3 items-center gap-x-1">
+                  <FormLabel className="text-right pr-2">Background Image</FormLabel>
                   <div className="col-span-2">
                     <FormControl>
-                      <BackgroundImageSelector 
-                        onImageSelect={field.onChange}
-                        selectedValue={field.value}
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        ref={ref}
+                        name={name}
+                        onBlur={onBlur}
+                        onChange={(e) => onChange(e.target.files)}
                       />
                     </FormControl>
                     <FormMessage className="mt-1" />

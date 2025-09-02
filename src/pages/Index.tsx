@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ImageGeneratorForm, ImageGeneratorFormValues } from "@/components/ImageGeneratorForm";
 import { GeneratedImage } from "@/components/GeneratedImage";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,20 +15,39 @@ const Index = () => {
   const generatedImageRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    return () => {
+      if (imageUrl && imageUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, [imageUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (userPhotoUrl && userPhotoUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(userPhotoUrl);
+      }
+    };
+  }, [userPhotoUrl]);
+
   const handleFormSubmit = (values: ImageGeneratorFormValues) => {
-    if (!values.backgroundImageUrl) {
-      showError("Please select a background image before generating.");
+    if (!values.backgroundImageFile || values.backgroundImageFile.length === 0) {
+      showError("Please upload a background image before generating.");
       return;
     }
 
-    setIsGenerating(false); // Set to false to show the component immediately
+    setIsGenerating(false);
     setImageData(values);
-    setImageUrl(values.backgroundImageUrl);
-    setUserPhotoUrl("");
 
+    const newImageUrl = URL.createObjectURL(values.backgroundImageFile[0]);
+    setImageUrl(newImageUrl);
+
+    let newUserPhotoUrl = "";
     if (values.userPhoto && values.userPhoto.length > 0) {
-      setUserPhotoUrl(URL.createObjectURL(values.userPhoto[0]));
+      newUserPhotoUrl = URL.createObjectURL(values.userPhoto[0]);
     }
+    setUserPhotoUrl(newUserPhotoUrl);
   };
 
   return (

@@ -29,53 +29,14 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
   const imageRef = useRef<HTMLImageElement>(null);
   const imageContentRef = useRef<HTMLDivElement>(null);
   const [renderedImageWidth, setRenderedImageWidth] = useState<number | undefined>(undefined);
-  const [displayImageUrl, setDisplayImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
 
-  const getProxiedImageUrl = (originalUrl: string) => {
-    if (!originalUrl || !originalUrl.startsWith('http')) {
-      return originalUrl;
-    }
-    const supabaseProjectUrl = "https://kfccagrpqidllhjqekmb.supabase.co";
-    return `${supabaseProjectUrl}/functions/v1/proxy-image?url=${encodeURIComponent(originalUrl)}`;
-  };
-
   useEffect(() => {
-    if (!imageUrl) {
-      setDisplayImageUrl("");
+    if (imageUrl) {
       setIsLoading(false);
-      return;
+    } else {
+      setIsLoading(true);
     }
-
-    setIsLoading(true);
-    let objectUrl: string | null = null;
-
-    const fetchAndSetImage = async () => {
-      try {
-        const proxiedUrl = getProxiedImageUrl(imageUrl);
-        const response = await fetch(proxiedUrl);
-        if (!response.ok) {
-          throw new Error('Failed to fetch proxied image');
-        }
-        const blob = await response.blob();
-        objectUrl = URL.createObjectURL(blob);
-        setDisplayImageUrl(objectUrl);
-      } catch (error) {
-        console.error("Error fetching image via proxy:", error);
-        showError("Could not load background image.");
-        setDisplayImageUrl(""); // Clear image on error
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAndSetImage();
-
-    return () => {
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
-      }
-    };
   }, [imageUrl]);
 
   const calculateImageSize = useCallback(() => {
@@ -101,7 +62,7 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
       imageElement.removeEventListener("load", handleLoad);
       window.removeEventListener("resize", calculateImageSize);
     };
-  }, [displayImageUrl, calculateImageSize]);
+  }, [imageUrl, calculateImageSize]);
 
   const handleSaveImage = () => {
     if (imageContentRef.current) {
@@ -159,10 +120,10 @@ export const GeneratedImage = React.forwardRef<HTMLDivElement, GeneratedImagePro
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                 </div>
-              ) : displayImageUrl ? (
+              ) : imageUrl ? (
                 <img
                   ref={imageRef}
-                  src={displayImageUrl}
+                  src={imageUrl}
                   alt="Generated background"
                   className="w-full h-auto"
                 />

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { ImageGeneratorForm, ImageGeneratorFormValues } from "@/components/ImageGeneratorForm";
 import { GeneratedImage } from "@/components/GeneratedImage";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Camera, CreditCard, LogOut, User, LifeBuoy } from "lucide-react";
+import { Camera, CreditCard, LogOut, User, LifeBuoy, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -28,7 +28,14 @@ const Index = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!session) return;
+      if (!session) {
+        setProfileData({
+          userName: "",
+          email: "",
+          phone: "",
+        });
+        return;
+      }
 
       const { data, error } = await supabase
         .from('profiles')
@@ -80,18 +87,27 @@ const Index = () => {
           <LifeBuoy className="mr-2 h-4 w-4" />
           Support
         </Button>
-        <Button variant="outline" onClick={() => navigate('/profile')}>
-          <User className="mr-2 h-4 w-4" />
-          Profile
-        </Button>
-        <Button variant="outline" onClick={() => navigate('/subscriptions')}>
-          <CreditCard className="mr-2 h-4 w-4" />
-          Subscription
-        </Button>
-        <Button variant="outline" onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
-        </Button>
+        {session ? (
+          <>
+            <Button variant="outline" onClick={() => navigate('/profile')}>
+              <User className="mr-2 h-4 w-4" />
+              Profile
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/subscriptions')}>
+              <CreditCard className="mr-2 h-4 w-4" />
+              Subscription
+            </Button>
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          </>
+        ) : (
+          <Button variant="outline" onClick={() => navigate('/login')}>
+            <LogIn className="mr-2 h-4 w-4" />
+            Login
+          </Button>
+        )}
       </div>
       <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start mt-16">
         <div className="w-full">

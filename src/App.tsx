@@ -31,7 +31,7 @@ const AppRoutes = () => {
       <Route path="/login" element={!session ? <Login /> : <Navigate to="/" replace />} />
       <Route 
         path="/" 
-        element={session ? <Index /> : <Navigate to="/login" replace />} 
+        element={<Index />} 
       />
       <Route 
         path="/profile" 
@@ -47,7 +47,7 @@ const AppRoutes = () => {
       />
       <Route 
         path="/support" 
-        element={session ? <Support /> : <Navigate to="/login" replace />} 
+        element={<Support />} 
       />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />

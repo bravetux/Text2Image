@@ -52,7 +52,7 @@ const Index = () => {
       <header className="absolute top-4 left-1/2 -translate-x-1/2 text-center text-sm text-gray-600 dark:text-gray-400">
         <p>Designed and Developed by Ysm. B Vignesh Kumar.</p>
         <a href="mailto:ic19939@gmail.com" className="text-blue-500 hover:underline">
-          ic19939@gmail.com
+          Email
         </a>
       </header>
       <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start mt-16">

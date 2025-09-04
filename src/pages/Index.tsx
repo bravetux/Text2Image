@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { ImageGeneratorForm, ImageGeneratorFormValues } from "@/components/ImageGeneratorForm";
 import { GeneratedImage } from "@/components/GeneratedImage";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Camera } from "lucide-react";
+import { Camera, Mail } from "lucide-react";
 import { showError } from "@/utils/toast";
 
 const Index = () => {
@@ -51,7 +51,8 @@ const Index = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4 md:p-8 relative">
       <header className="absolute top-4 left-1/2 -translate-x-1/2 text-center text-sm text-gray-600 dark:text-gray-400">
         <p>Designed and Developed by Ysm. B Vignesh Kumar.</p>
-        <a href="mailto:ic19939@gmail.com" className="text-blue-500 hover:underline">
+        <a href="mailto:ic19939@gmail.com" className="text-blue-500 hover:underline inline-flex items-center gap-1">
+          <Mail className="h-4 w-4" />
           Email
         </a>
       </header>

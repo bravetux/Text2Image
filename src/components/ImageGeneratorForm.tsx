@@ -125,7 +125,7 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
   return (
     <Card className="w-full max-w-lg">
       <CardHeader>
-        <CardTitle>Text to Image Generator</CardTitle>
+        <CardTitle>Text to Image Generator (2025)</CardTitle>
         <CardDescription>Enter the details below to generate your image.</CardDescription>
       </CardHeader>
       <CardContent>

@@ -2,9 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { ImageGeneratorForm, ImageGeneratorFormValues } from "@/components/ImageGeneratorForm";
 import { GeneratedImage } from "@/components/GeneratedImage";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Camera, LifeBuoy } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Camera } from "lucide-react";
 import { showError } from "@/utils/toast";
 
 const Index = () => {
@@ -13,7 +11,6 @@ const Index = () => {
   const [userPhotoUrl, setUserPhotoUrl] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const generatedImageRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     return () => {
@@ -52,12 +49,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4 md:p-8 relative">
-      <div className="absolute top-4 right-4 flex gap-2">
-        <Button variant="outline" onClick={() => navigate('/support')}>
-          <LifeBuoy className="mr-2 h-4 w-4" />
-          Support
-        </Button>
-      </div>
       <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start mt-16">
         <div className="w-full">
           <ImageGeneratorForm 
@@ -66,7 +57,7 @@ const Index = () => {
           />
         </div>
         
-        <div className="w-full flex items-center justify-center md:sticky md-top-8">
+        <div className="w-full flex items-center justify-center md:sticky md:top-8">
           {isGenerating ? (
             <div className="w-full max-w-lg space-y-2">
               <Skeleton className="h-96 w-full rounded-t-xl" />

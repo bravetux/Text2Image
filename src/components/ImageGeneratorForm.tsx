@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -86,12 +86,36 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
   const [isLayoutOptionsOpen, setIsLayoutOptionsOpen] = useState(false);
   const [isColorOptionsOpen, setIsColorOptionsOpen] = useState(false);
   const [isAppExpired, setIsAppExpired] = useState(false);
+  const [isVerifyingDate, setIsVerifyingDate] = useState(true);
 
   useEffect(() => {
-    const currentYear = new Date().getFullYear();
-    if (currentYear >= 2026) {
-      setIsAppExpired(true);
-    }
+    const verifyExpirationDate = async () => {
+      const localYear = new Date().getFullYear();
+      if (localYear > 2025) {
+        setIsAppExpired(true);
+        setIsVerifyingDate(false);
+        return;
+      }
+
+      try {
+        const response = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
+        if (!response.ok) {
+          throw new Error('Network response was not ok for worldtimeapi');
+        }
+        const data = await response.json();
+        const serverYear = new Date(data.utc_datetime).getFullYear();
+        
+        if (serverYear > 2025) {
+          setIsAppExpired(true);
+        }
+      } catch (error) {
+        console.warn("Could not verify server time. Relying on system time. Error:", error);
+      } finally {
+        setIsVerifyingDate(false);
+      }
+    };
+
+    verifyExpirationDate();
   }, []);
 
   const getInitialValues = () => {
@@ -121,6 +145,26 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
       console.warn("Error writing to localStorage:", error);
     }
   }, [JSON.stringify(watchedValues)]);
+
+  const getButtonContent = () => {
+    if (isVerifyingDate) {
+      return (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Verifying...
+        </>
+      );
+    }
+    if (isGenerating) {
+      return (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Generating...
+        </>
+      );
+    }
+    return "Generate Image";
+  };
 
   return (
     <Card className="w-full max-w-lg">
@@ -290,8 +334,8 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
                   </p>
                 </div>
               ) : (
-                <Button type="submit" disabled={isGenerating} className="w-full">
-                  {isGenerating ? "Generating..." : "Generate Image"}
+                <Button type="submit" disabled={isGenerating || isVerifyingDate} className="w-full">
+                  {getButtonContent()}
                 </Button>
               )}
             </div>

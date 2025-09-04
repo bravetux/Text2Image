@@ -85,6 +85,14 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
   const [isImageOptionsOpen, setIsImageOptionsOpen] = useState(false);
   const [isLayoutOptionsOpen, setIsLayoutOptionsOpen] = useState(false);
   const [isColorOptionsOpen, setIsColorOptionsOpen] = useState(false);
+  const [isAppExpired, setIsAppExpired] = useState(false);
+
+  useEffect(() => {
+    const currentYear = new Date().getFullYear();
+    if (currentYear >= 2026) {
+      setIsAppExpired(true);
+    }
+  }, []);
 
   const getInitialValues = () => {
     try {
@@ -270,9 +278,22 @@ export function ImageGeneratorForm({ onSubmit, isGenerating }: ImageGeneratorFor
             />
 
             <div className="pt-2">
-              <Button type="submit" disabled={isGenerating} className="w-full">
-                {isGenerating ? "Generating..." : "Generate Image"}
-              </Button>
+              {isAppExpired ? (
+                <div className="text-center text-destructive p-3 border border-destructive/50 rounded-md bg-destructive/10">
+                  <p className="font-semibold">This application has expired.</p>
+                  <p className="text-sm">
+                    Please contact the developer at{" "}
+                    <a href="mailto:ic19939@gmail.com" className="underline">
+                      ic19939@gmail.com
+                    </a>{" "}
+                    to continue.
+                  </p>
+                </div>
+              ) : (
+                <Button type="submit" disabled={isGenerating} className="w-full">
+                  {isGenerating ? "Generating..." : "Generate Image"}
+                </Button>
+              )}
             </div>
 
             <Collapsible open={isTextOptionsOpen} onOpenChange={setIsTextOptionsOpen}>
